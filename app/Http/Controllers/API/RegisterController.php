@@ -22,23 +22,24 @@ class RegisterController extends Controller
             $name = $request->input('name');
             $email = $request->input('email');
             $password = Hash::make($request->input('password'));
-    
+
             User::create([
                 'name' => trim($name),
                 'email' => trim($email),
                 'password' => $password
             ]);
-    
+
             return response()->json([
                 'success' => true,
                 'message' => "User has been created",
-                'code' => 201
+                'code' => 200
             ]);
         } catch (Exception $e) {
-            return response()->json(['success' => false,
-            'message' => $e->getMessage(),
-            'code' => $e->getCode()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'code' => $e->getCode()
+            ]);
         }
-
     }
 }

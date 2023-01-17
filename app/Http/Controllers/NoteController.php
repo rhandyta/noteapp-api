@@ -77,9 +77,23 @@ class NoteController extends Controller
      * @param  \App\Models\Note  $note
      * @return \Illuminate\Http\Response
      */
-    public function show(Note $note)
+    public function show($id)
     {
-        //
+        try {
+            $note = Note::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'notes' => $note,
+                'message' => "fetch note success",
+                'code' => 200
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Note not found",
+                'code' => 404
+            ]);
+        }
     }
 
     /**
@@ -109,11 +123,11 @@ class NoteController extends Controller
                     'success' => true,
                     'message' => "Note has been updated",
                     'note' => $result,
-                    'code' => 201
+                    'code' => 200
                 ]);
             } else {
                 return response()->json([
-                    'success' => true,
+                    'success' => false,
                     'message' => "Note not found",
                     'code' => 404
                 ]);
@@ -122,7 +136,7 @@ class NoteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'code' => $e->getCode()
+                'code' => 404
             ]);
         }
     }
@@ -133,8 +147,22 @@ class NoteController extends Controller
      * @param  \App\Models\Note  $note
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Note $note)
+    public function destroy($id)
     {
-        //
+        try {
+            $note = Note::findOrFail($id);
+            $note->delete();
+            return response()->json([
+                'success' => true,
+                'message' => "delete note success",
+                'code' => 200
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Note not found",
+                'code' => 404
+            ]);
+        }
     }
 }
