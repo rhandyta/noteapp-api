@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
+            $table->uuid('key')->unique();
             $table->foreignId('user_id')->constrained()->references('id')->on('users');
             $table->string('title', 150);
             $table->text('body');
+            $table->string('slug');
             $table->tinyInteger('visible')->default(0)->comment('0 => visible, 1 => invisible');
             $table->tinyInteger('archive')->default(0)->comment('0 => not archive, 1 => archive');
             $table->timestamps();
@@ -32,6 +34,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropSoftDeletes('notes');
+
+        Schema::dropIfExists('notes');
+        // Schema::dropSoftDeletes('notes');
     }
 };

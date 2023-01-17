@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::post('logout', function() {
+    Route::post('logout', function () {
         try {
             $user = auth('sanctum')->user();
             $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
@@ -31,7 +31,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 'message' => 'Logout Successfully',
                 'code' => 200,
             ]);
-            
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -44,3 +43,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::post('register', RegisterController::class);
 Route::post('login', LoginController::class);
+
+// Notes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::resource('notes', App\Http\Controllers\NoteController::class)->except(['create', 'edit']);
+});

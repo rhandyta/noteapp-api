@@ -11,5 +11,11 @@ class Note extends Model
     use SoftDeletes;
     use HasFactory;
     protected $table = 'notes';
-    protected $fillable = ['user_id','title','body','visible','archive'];
+    protected $fillable = ['user_id', 'title', 'body', 'visible', 'archive', 'slug', 'key'];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

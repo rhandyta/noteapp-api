@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use App\Http\Requests\StoreNoteRequest;
 use App\Http\Requests\UpdateNoteRequest;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Ramsey\Uuid\Uuid;
 
 class NoteController extends Controller
 {
@@ -15,18 +18,25 @@ class NoteController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $notes = Note::where('visible', '=', 0)
+                ->where('archive', '=', 0)
+                ->get();
+            return response()->json([
+                'success' => true,
+                'notes' => $notes,
+                'message' => "fetch notes success",
+                'code' => 200
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'code' => $e->getCode()
+            ]);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -36,7 +46,29 @@ class NoteController extends Controller
      */
     public function store(StoreNoteRequest $request)
     {
-        //
+        try {
+            $auth = Auth::user();
+            $note = Note::create([
+                'user_id' => $auth->id,
+                'key' => Uuid::uuid4(),
+                'title' => ucfirst($request->input('title')),
+                'slug' => \Str::slug($request->input('title')),
+                'body' => $request->input('body'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Note has been created",
+                'note' => $note,
+                'code' => 201
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'code' => $e->getCode()
+            ]);
+        }
     }
 
     /**
@@ -51,26 +83,48 @@ class NoteController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Note $note)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateNoteRequest  $request
      * @param  \App\Models\Note  $note
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateNoteRequest $request, Note $note)
+    public function update(UpdateNoteRequest $request)
     {
-        //
+        try {
+            $auth = Auth::user();
+            $note = Note::where('user_id', '=', $auth->id)
+                ->where('id', '=', (int)$request->input('id'))
+                ->update([
+                    'title' => ucfirst($request->input('title')),
+                    'body' => $request->input('body'),
+                    'visible' => $request->input('visible'),
+                    'archive' => $request->input('archive'),
+                ]);
+
+
+            if ($note) {
+                $result = Note::findOrFail($request->input('id'));
+                return response()->json([
+                    'success' => true,
+                    'message' => "Note has been updated",
+                    'note' => $result,
+                    'code' => 201
+                ]);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Note not found",
+                    'code' => 404
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'code' => $e->getCode()
+            ]);
+        }
     }
 
     /**
