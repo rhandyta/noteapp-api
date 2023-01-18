@@ -21,7 +21,10 @@ class NoteController extends Controller
         try {
             $notes = Note::where('visible', '=', 0)
                 ->where('archive', '=', 0)
-                ->get();
+                ->with('user')
+                ->orderBy('created_at', "DESC")
+                ->paginate(10);
+
             return response()->json([
                 'success' => true,
                 'notes' => $notes,
