@@ -57,6 +57,8 @@ class NoteController extends Controller
                 'title' => ucfirst($request->input('title')),
                 'slug' => \Str::slug($request->input('title')),
                 'body' => $request->input('body'),
+                'visible' => $request->input('visible') ? 1 : 0,
+                'archive' => $request->input('archive') ? 1 : 0
             ]);
 
             return response()->json([
