@@ -88,7 +88,7 @@ class NoteController extends Controller
             $note = Note::where('slug', '=', $id)->first();
             return response()->json([
                 'success' => true,
-                'notes' => $note,
+                'note' => $note,
                 'message' => "fetch note success",
                 'code' => 200
             ]);
