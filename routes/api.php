@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\NoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,5 +47,6 @@ Route::post('login', LoginController::class);
 
 // Notes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::resource('notes', App\Http\Controllers\NoteController::class)->except(['create', 'edit']);
+    Route::resource('notes', App\Http\Controllers\NoteController::class)->except(['create', 'edit', 'show']);
+    Route::get('notes/show/{slug}', [NoteController::class, 'show']);
 });

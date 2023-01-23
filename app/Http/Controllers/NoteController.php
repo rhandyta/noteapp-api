@@ -85,7 +85,7 @@ class NoteController extends Controller
     public function show($id)
     {
         try {
-            $note = Note::findOrFail($id);
+            $note = Note::where('slug', '=', $id)->first();
             return response()->json([
                 'success' => true,
                 'notes' => $note,
