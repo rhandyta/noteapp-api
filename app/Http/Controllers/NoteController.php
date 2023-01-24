@@ -18,9 +18,15 @@ class NoteController extends Controller
      */
     public function index()
     {
+        $auth = Auth::user();
         try {
-            $notes = Note::where('visible', '=', 0)
-                ->where('archive', '=', 0)
+                $notes = Note::where(function ($query) {
+                    $query->where('visible', 0)
+                          ->orWhere(function ($query) {
+                              $query->where('user_id', auth()->id())
+                                    ->where('visible', 1);
+                          });
+                })->where('archive', 0)
                 ->with('user')
                 ->orderBy('created_at', "DESC")
                 ->paginate(10);
@@ -155,7 +161,7 @@ class NoteController extends Controller
     public function destroy($id)
     {
         try {
-            $note = Note::findOrFail($id);
+            $note = Note::where('slug', '=', $id)->firstOrFail();
             $note->delete();
             return response()->json([
                 'success' => true,
