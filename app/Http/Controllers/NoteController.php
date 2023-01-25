@@ -114,12 +114,12 @@ class NoteController extends Controller
      * @param  \App\Models\Note  $note
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateNoteRequest $request)
+    public function update($slug, UpdateNoteRequest $request)
     {
         try {
             $auth = Auth::user();
             $note = Note::where('user_id', '=', $auth->id)
-                ->where('id', '=', (int)$request->input('id'))
+                ->where('slug', '=', $slug)
                 ->update([
                     'title' => ucfirst($request->input('title')),
                     'body' => $request->input('body'),
@@ -129,7 +129,7 @@ class NoteController extends Controller
 
 
             if ($note) {
-                $result = Note::findOrFail($request->input('id'));
+                $result = Note::where('slug', '=', $slug)->firstOrFail();
                 return response()->json([
                     'success' => true,
                     'message' => "Note has been updated",
