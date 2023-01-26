@@ -22,8 +22,8 @@ class NoteFactory extends Factory
             'user_id' => fake()->randomElement([1, 2]),
             'title' => $title,
             'body' => fake()->text(300),
-            'visible' => fake()->randomElement([1, 0]),
-            'archive' => fake()->randomElement([1, 0]),
+            'visible' => fake()->randomElement([0, 1]),
+            'archive' => fake()->randomElement([0, 1]),
             'key' => Uuid::uuid4(),
             'slug' => \Str::slug($title)
         ];

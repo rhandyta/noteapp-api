@@ -120,23 +120,22 @@ class NoteController extends Controller
     public function update($slug, UpdateNoteRequest $request)
     {
         try {
-            $auth = Auth::user();
-            $note = Note::where('user_id', '=', $auth->id)
-                ->where('slug', '=', $slug)
-                ->update([
-                    'title' => ucfirst($request->input('title')),
-                    'body' => $request->input('body'),
-                    'visible' => $request->input('visible'),
-                    'archive' => $request->input('archive'),
-                ]);
-
+            $note = Note::where('slug', '=', $slug)->firstOrFail();
+            $note->title = ucfirst($request->input('title'));
+            $note->body = $request->input('body');
+             if($request->has('visible')) {
+                $note->visible = (int)$request->input('visible');
+            }
+            if($request->has('archive')){
+                $note->archive = (int)$request->input('archive');
+            }
+            $note->save();
 
             if ($note) {
-                $result = Note::where('slug', '=', $slug)->firstOrFail();
                 return response()->json([
                     'success' => true,
                     'message' => "Note has been updated",
-                    'note' => $result,
+                    'note' => $note,
                     'code' => 200
                 ]);
             } else {
@@ -205,5 +204,27 @@ class NoteController extends Controller
                 'code' => 404
             ]);
         }
+    }
+
+    public function archive()
+    {
+        try {
+            $auth = Auth::user();
+            $notes = Note::with('user')->where('archive', '=', 1)->orderBy('created_at', 'DESC')
+                    ->where('user_id', '=', $auth->id)->get();
+            return response()->json([
+                'success' => true,
+                'notes' => $notes,
+                'code' => 200
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Notes not found",
+                'code' => 404
+            ]);
+        }
+        
+
     }
 }
