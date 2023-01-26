@@ -68,6 +68,8 @@ class NoteController extends Controller
                 'archive' => $request->input('archive') ? 1 : 0
             ]);
 
+            $note['user'] = $auth;
+
             return response()->json([
                 'success' => true,
                 'message' => "Note has been created",
