@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateNoteRequest;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Http\Request;
 
 class NoteController extends Controller
 {
@@ -169,6 +170,33 @@ class NoteController extends Controller
                 'code' => 200
             ]);
         } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Note not found",
+                'code' => 404
+            ]);
+        }
+    }
+
+    public function search(Request $request)
+    {
+        try {
+            $note = Note::where('title', 'LIKE', '%' . $request->input('title') . '%')
+                    ->where(function ($query) {
+                    $query->where('visible', 0)
+                          ->orWhere(function ($query) {
+                              $query->where('user_id', auth()->id())
+                                    ->where('visible', 1);
+                          });
+                })
+                    ->where('archive', '=', 0)->get();
+             return response()->json([
+                'success' => true,
+                'notes' => $note,
+                'message' => "fetch note success",
+                'code' => 200
+            ]);
+        } catch(Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => "Note not found",

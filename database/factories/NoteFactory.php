@@ -21,7 +21,7 @@ class NoteFactory extends Factory
         return [
             'user_id' => fake()->randomElement([1, 2]),
             'title' => $title,
-            'body' => fake()->text(150),
+            'body' => fake()->text(300),
             'visible' => fake()->randomElement([1, 0]),
             'archive' => fake()->randomElement([1, 0]),
             'key' => Uuid::uuid4(),

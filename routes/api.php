@@ -49,4 +49,5 @@ Route::post('login', LoginController::class);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('notes', App\Http\Controllers\NoteController::class)->except(['create', 'edit', 'show']);
     Route::get('notes/show/{slug}', [NoteController::class, 'show']);
+    Route::get('notes/search', [NoteController::class, 'search']);
 });
